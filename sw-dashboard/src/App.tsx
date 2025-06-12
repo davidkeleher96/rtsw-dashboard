@@ -107,7 +107,7 @@ export default function App() {
   // -- UI --------------------------------------
 
 return (
-  <div className="min-h-screen w-full grid grid-rows-[auto,1fr] gap-2 p-5 bg-[#0d1117] text-[#c9d1d9] ">
+  <div className="h-screen w-full grid grid-rows-[auto,1fr] gap-2 p-5 bg-[#0d1117] text-[#c9d1d9] ">
     {/* Header */}
     <header className="flex justify-between items-center">
       <h2 className="text-2xl font-bold">Propagated Solar-Wind Dashboard</h2>
@@ -128,11 +128,11 @@ return (
     </header>
 
     {/* Main */}
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 overflow-auto">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 h-full overflow-hidden min-h-0">
       {/* Left: metrics & chart */}
       <div className="lg:col-span-2 flex flex-col gap-2 h-full">
         {/* Metrics */}
-        <div className="bg-[#1e2a38] p-6 rounded-lg shadow grid grid-cols-4 gap-4">
+        <div className="bg-[#1e2a38] p-6 rounded-lg shadow grid grid-cols-4 gap-4 ">
       <MetricTile label="Speed"        value={latest.speed?.toFixed(0)}  unit=" km/s" color={tileColor.speed} />
       <MetricTile label="Density"      value={latest.density?.toFixed(1)} unit=" p/cm³" color={tileColor.density} />
       <MetricTile label="Bz"           value={latest.bz?.toFixed(1)}     unit=" nT"   color={tileColor.bz} />
@@ -172,7 +172,7 @@ return (
       </div>
 
       {/* Right: alerts */}
-      <div className="bg-[#1e2a38] p-6 rounded-lg shadow flex flex-col">
+      <div className="bg-[#1e2a38] p-6 rounded-lg shadow flex flex-col min-h-0">
         <h3 className="text-xl font-semibold mb-4">
           Current Alerts
         </h3>
