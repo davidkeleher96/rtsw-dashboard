@@ -141,7 +141,7 @@ return (
 
         {/* Chart */}
         <div className="bg-[#1e2a38] p-6 rounded-lg shadow flex-1">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100g%">
             <LineChart data={data}>
               <CartesianGrid stroke="#222" />
               <XAxis dataKey="tsLabel" tick={{ fontSize: 10 }} interval="preserveStartEnd" />
