@@ -49,8 +49,8 @@ This project containerizes the process of polling SWPC data from NOAA in an exte
 
 1. **Clone the repo**  
    ```bash
-   git clone 
-   cd solar-wind-dashboard
+   git clone https://github.com/davidkeleher96/rtsw-dashboard.git
+   cd rtsw-dashboard
    ```
 
 2. **Build the Docker images**  
