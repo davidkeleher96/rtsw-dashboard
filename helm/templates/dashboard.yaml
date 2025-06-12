@@ -14,12 +14,22 @@ data:
       index index.html;
 
       # Proxy /api/* to sw-api service
-      location /api/ {
-        proxy_pass         http://sw-api:5000/;
-        proxy_set_header   Host              $host;
-        proxy_set_header   X-Real-IP         $remote_addr;
-        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
-      }
+    location /api/ {
+      proxy_pass         http://sw-api:5000/;
+      proxy_set_header   Host              $host;
+      proxy_set_header   X-Real-IP         $remote_addr;
+      proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+      proxy_http_version 1.1;
+      proxy_set_header   Connection        '';
+      proxy_buffering    off;
+
+      #  Extend timeouts so the stream can stay open
+      proxy_read_timeout 3600s;   # time to wait for a single read
+      proxy_send_timeout 3600s;   # time to wait for a single write
+    }
+
+      
 
       # fallback
       location / {
