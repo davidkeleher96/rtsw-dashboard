@@ -1,0 +1,96 @@
+# --------------------------  MONGO RS  -------------------------
+# 1. Headless Service for the replica-set
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: solar-wind
+  labels:
+    app: mongo
+spec:
+  ports:
+  - port: 27017
+    name: mongo
+  clusterIP: None # headless
+  selector:
+    app: mongo
+---
+# 2. StatefulSet running mongod with replica set enabled
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: solar-wind
+spec:
+  serviceName: "mongo"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongod
+        image: mongo:6.0
+        command:
+        - mongod
+        - "--replSet=rs0"
+        - "--bind_ip_all"
+        ports:
+        - containerPort: 27017
+          name: mongo
+        volumeMounts:
+        - name: mongo-pvc
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-pvc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
+---
+# 3. Replica Set Initialization Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongo-init
+  namespace: solar-wind
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: init-rs
+        image: mongo:6.0
+        command:
+        - bash
+        - -c
+        - |
+          # 1. Wait for all 3 members to be up
+          for i in 0 1 2; do
+            echo "waiting for mongo-${i}.mongo to come up…"
+            until mongosh --host mongo-${i}.mongo --eval "db.adminCommand('ping')" &> /dev/null; do
+              sleep 5
+            done
+          done
+
+          # 2. Initiate the replica set
+          echo "Initiating rs0…"
+          mongosh --host mongo-0.mongo <<EOF
+            rs.initiate({
+              _id: "rs0",
+              members: [
+                { _id: 0, host: "mongo-0.mongo:27017" },
+                { _id: 1, host: "mongo-1.mongo:27017" },
+                { _id: 2, host: "mongo-2.mongo:27017" }
+              ]
+            });
+            rs.status();
+          EOF
+---

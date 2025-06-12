@@ -1,0 +1,135 @@
+# -------- shared configs for every poller ----------------
+image:
+  repository: sw-poll
+  tag: latest
+  pullPolicy: IfNotPresent
+
+namespace: solar-wind
+mongo:
+  uri: "mongodb://mongo-0.mongo:27017,mongo-1.mongo:27017,mongo-2.mongo:27017/?replicaSet=rs0"
+  db: "spaceweather"
+
+poller:
+  pollInterval: "60"
+  maxStartupRetries: "5"
+  retryDelay: "5"
+
+resources:
+  requests: { cpu: 50m, memory: 64Mi }
+  limits: { cpu: 200m, memory: 128Mi }
+
+uniqueKeysDefault:
+- time_tag
+
+liveness:
+  initialDelaySeconds: 60
+  periodSeconds: 300
+# ---------- specific poller configs -------------
+
+
+pollers:
+  # -- realtime solar-wind / IMF (RTSW) -----------
+  solar-wind:
+    collection: solar_wind
+    endpoint: "https://services.swpc.noaa.gov/products/geospace/propagated-solar-wind-1-hour.json"
+    uniqueKeys:
+    - "time_tag"
+
+  rtsw-mag:
+    collection: rtsw_mag
+    endpoint: "https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json"
+    uniqueKeys:
+    - "time_tag"
+
+  # -- Geomagnetic indices --------------------------
+  planetary-k:
+    collection: planetary_k_index
+    endpoint: "https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"
+    uniqueKeys:
+    - "time_tag"
+
+  boulder-k:
+    collection: boulder_k_index
+    endpoint: "https://services.swpc.noaa.gov/json/boulder_k_index_1m.json"
+    uniqueKeys:
+    - "time_tag"
+
+  # -- Aurora probability model ---------------------
+  aurora:
+    collection: ovation_aurora
+    endpoint: "https://services.swpc.noaa.gov/json/ovation_aurora_latest.json"
+    uniqueKeys:
+    - "observation_time"
+
+  # -- CME WSA-Enlil model time series --------------
+  enlil:
+    collection: enlil_timeseries
+    endpoint: "https://services.swpc.noaa.gov/json/enlil_time_series.json"
+    uniqueKeys:
+    - "time_tag"
+
+  # -- Solar-cycle context metrics ------------------
+  f107-daily:
+    collection: f107_daily
+    endpoint: "https://services.swpc.noaa.gov/json/f107_cm_flux.json"
+    uniqueKeys:
+    - "time_tag"
+
+  f107-predicted:
+    collection: f107_predicted
+    endpoint: "https://services.swpc.noaa.gov/json/predicted_f107cm_flux.json"
+    uniqueKeys:
+    - "date"
+
+  solar-regions:
+    collection: solar_regions
+    endpoint: "https://services.swpc.noaa.gov/json/solar_regions.json"
+    uniqueKeys:
+    - "observed_date"
+    - "region"
+
+  # -- Human-edited event log (flares, CMEs, bursts) -
+  edited-events:
+    collection: edited_events
+    endpoint: "https://services.swpc.noaa.gov/json/edited_events.json"
+    uniqueKeys:
+    - "begin_datetime"
+    - "observatory"
+    - "type"
+
+  xray-flares:
+    collection: xray_flares
+    endpoint: https://services.swpc.noaa.gov/json/goes/primary/xray-flares-7-day.json
+    uniqueKeys:
+    - "time_tag"
+
+  dst:
+    collection: dst
+    endpoint: https://services.swpc.noaa.gov/json/geospace/geospace_dst_1_hour.json
+    uniqueKeys:
+    - "time_tag"
+
+# SW-API
+swApi:
+  serviceName: sw-api
+  servicePort: 5000
+# -- Redis settings for alert engine -----------------------------------
+redis:
+  enabled: true
+
+  image:
+    repository: redis
+    tag: 7.0-alpine
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 6379
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi

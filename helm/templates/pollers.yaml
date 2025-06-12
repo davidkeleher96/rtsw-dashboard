@@ -1,0 +1,60 @@
+{{- /*
+     Loops over .Values.pollers and renders one Deployment per entry.
+     Use  `helm template ./helm`  to verify the output.
+*/ -}}
+{{- range $name, $cfg := .Values.pollers }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}-poller
+  {{- with $.Values.namespace }}
+  namespace: {{ . }}
+  {{- end }}
+  labels:
+    app: {{ $name }}-poller
+spec:
+  replicas: {{ default 1 $cfg.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}-poller
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}-poller
+    spec:
+      containers:
+        - name: poller
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          env:
+            - name: MONGO_URI
+              value: {{ $.Values.mongo.uri | quote }}
+            - name: MONGO_DB
+              value: {{ $.Values.mongo.db | quote }}
+            - name: MONGO_COLLECTION
+              value: {{ $cfg.collection | quote }}
+{{- if $cfg.endpoint }}
+            - name: ENDPOINT
+              value: {{ $cfg.endpoint | quote }}
+{{- end }}
+  {{- $keys := default $.Values.uniqueKeysDefault $cfg.uniqueKeys -}}
+
+  {{- if $keys }}
+            - name: UNIQUE_KEYS
+              value: '{{ toJson $keys }}'
+  {{- end }}
+            - name: POLL_INTERVAL
+              value: {{ $.Values.poller.pollInterval | quote }}
+            - name: MAX_STARTUP_RETRIES
+              value: {{ $.Values.poller.maxStartupRetries | quote }}
+            - name: RETRY_DELAY
+              value: {{ $.Values.poller.retryDelay | quote }}
+          resources:
+{{- toYaml $.Values.resources | nindent 12 }}
+          livenessProbe:
+            exec:
+              command: [ "pgrep", "-f", "app.py" ]
+            initialDelaySeconds: {{ $.Values.liveness.initialDelaySeconds }}
+            periodSeconds: {{ $.Values.liveness.periodSeconds }}
+---
+{{- end }}

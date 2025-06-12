@@ -1,0 +1,95 @@
+# === Python ===
+# Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environments
+venv/
+.env/
+.env.*         
+.env.local
+venv.bak/
+
+# Distribution / packaging
+build/
+dist/
+eggs/
+*.egg-info/
+*.egg
+*.wheel
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Coverage and testing
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+
+# Mypy
+.mypy_cache/
+
+# === React / Node ===
+# dependencies
+node_modules/
+
+# build output
+build/
+dist/
+.out/
+.tmp/
+
+# production
+.env.production
+.env.production.local
+
+# misc
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.test
+
+# Editor directories and files
+.vscode/
+.idea/
+
+# MacOS
+.DS_Store
+
+# Logs
+logs
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Testing
+coverage/
+coverage-final.json
