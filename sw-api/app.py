@@ -60,10 +60,18 @@ def get_data():
     if (e := request.args.get("end")):
         q.setdefault("time_tag", {})["$lte"] = datetime.fromisoformat(e)
 
+    # Pull the most recent docs
     limit = int(request.args.get("limit", 1000))
+    cursor = (
+        col.find(q)
+           .sort("time_tag", -1)   
+           .limit(limit)
+    )
 
-    cursor = col.find(q).sort("time_tag", -1).limit(limit)
-    docs = [serialize_doc(d) for d in cursor]
+    
+    docs = [serialize_doc(doc) for doc in cursor]
+    docs.reverse()
+
     return jsonify(docs), 200
 
 @app.route("/alerts", methods=["GET"])
