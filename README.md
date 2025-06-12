@@ -110,7 +110,7 @@ This will spin up a new `sw-poll` pod that writes into the specified MongoDB col
 └── sw-dashboard/             # React dashboard & live charts
     └── src/
 ```
-
+![Dashboard screenshot](/images/flowchart.png)
 - **sw-poll**  
   Configurable Python function that polls an HTTP JSON endpoint on a set cadence and upserts into MongoDB.
 
