@@ -21,6 +21,9 @@
 
 This project containerizes the process of polling SWPC data from NOAA in an extensible format to make the data easily accessible for real-time dashboarding, alerting, and machine-learning workflows.
 
+
+![Dashboard screenshot](/images/dashboard.png)
+![Dashboard screenshot](/images/dashboard2.png)
 ---
 
 ## Tech Stack
